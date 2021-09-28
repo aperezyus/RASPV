@@ -1,4 +1,4 @@
 # RASPV: A Robotics Framework for Augmented Simulated Prosthetic Vision
 
 
-_IN CONSTRUCTION_
+_Manuscript under review. Code will be available later._
