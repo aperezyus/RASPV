@@ -8,9 +8,25 @@
 
 **Contact:** send an email to alperez@unizar
 
-This package includes all the robotics framework to perform experimentation with Simulated Prosthetic Vision (SPV) according to our published paper. Particularly, it includes the creation of phosphene images and all the RGB-D processing and codification in phosphene patterns for several visualization proposals. It can work standalone with a standard RGB-D camera (e.g. Asus Xtion Pro Live with OpenNI2) or in simulation with our modified version of the ROS Turtlebot package for Gazebo (`blindbot` package). Also, som related packages such as the modified ROS `navigation_RASPV` package are included as well.
+**Cite:** Please, if you are going to use this work, include this citation:
+```
+@article{perez2024raspv,
+  title={RASPV: A Robotics Framework for Augmented Simulated Prosthetic Vision},
+  author={Perez-Yus, Alejandro and Santos-Villafranca, Maria and Tomas-Barba, Julia and Bermudez-Cameo, Jesus and Montano-Olivan, Lorenzo and Lopez-Nicolas, Gonzalo and Guerrero, Jose J},
+  journal={IEEE Access},
+  year={2024},
+  volume={12},
+  number={},
+  pages={15251-15267}
+}
+```
 
-Instructions are given below. If you find something that is not included, it may be in development and not ready for publication yet. If you see anything broken, you can post an issue or directly contact the authors.
+This package includes all the robotics framework to perform experimentation with Simulated Prosthetic Vision (SPV) according to our published paper. Particularly, it includes the creation of phosphene images and all the RGB-D processing and codification in phosphene patterns for several visualization proposals. It can work standalone with a standard RGB-D camera (e.g. Asus Xtion Pro Live with OpenNI2) or in simulation with our modified version of the ROS Turtlebot package for Gazebo (`blindbot` package). Here we include four packages:
+- `raspv/` : The main package including the SPV and the pointcloud and image processing.
+- `blindbot/` : Our humanized robot for our virtual environment implementation
+- `navigation/` : The navigation package for the navigation experiments
+
+Instructions are given below. If you see anything broken, you can post an issue or directly contact the authors. If you find something missing, it may be not ready for publication yet. Feel free to contact the authors if you need more information.https://meet.google.com/pnt-vock-tby
 
 Tried on:
 - Ubuntu 16.04 with ROS Kinetic
@@ -20,10 +36,10 @@ Tried on:
 Note: If you have ROS Kinetic/Melodic/Noetic desktop-full installed with the workspace already set up, jump to point 3!
 
 ## 1. Install ROS
-*Note: This explanation is for Kinetic but it's the same for Melodic and probably others*
+*Note: This explanation is for Noetic but it's the similar for Kinetic/Melodic and probably others*
 
 Following the link:
-http://wiki.ros.org/kinetic/Installation/Ubuntu
+http://wiki.ros.org/noetic/Installation/Ubuntu (change 'noetic' for your distro)
 
 Step by step:
 - Set up sources.list
@@ -32,19 +48,20 @@ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main
 ```
 - Set up keys
 ```
-sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+sudo apt install curl # if you haven't already installed curl
+curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 ```
 - Update
 ```
-sudo apt-get update
+sudo apt update
 ```
 - Install desktop-full version:
 ```
-sudo apt-get install ros-kinetic-desktop-full
+sudo apt install ros-noetic-desktop-full
 ```
 - Environment setup:
 ```
-echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -54,15 +71,15 @@ Following the link:
 http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment#Create_a_ROS_Workspace
 
 Step by step:
-- Create workspace in your home directory (here called `catkin_ws`)
+- Create workspace in your home directory (here called `raspv_ws`)
 ```
-$ mkdir -p ~/catkin_ws/src
-$ cd ~/catkin_ws/
+$ mkdir -p ~/raspv_ws/src
+$ cd ~/raspv_ws/
 $ catkin_make
 ```
 - Environment setup:
 ```
-echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+echo "source ~/raspv_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 - Confirm workspace is set up correctly
@@ -71,31 +88,31 @@ echo $ROS_PACKAGE_PATH
 ```
 you should see something like:
 ```
-/home/user/catkin_ws/src:/opt/ros/kinetic/share
+/home/user/raspv_ws/src:/opt/ros/kinetic/share
 ```
 
 Alternatively, instead of `catkin_make`it can also be installed with `catkin build`:
 https://catkin-tools.readthedocs.io/en/latest/installing.html
 https://catkin-tools.readthedocs.io/en/latest/quick_start.html
 ```
-cd ~/catkin_ws/
+cd ~/raspv_ws/
 catkin init
 
 ```
 
 ## 3. Download packages:
-These packages should be in placed in the `catkin_ws/src` folder (`cd ~/catkin_ws/src` if necessary). If you have your workspace named differently, substitute `catkin_ws` for your workspace name from here on.
+These packages should be in placed in the `raspv_ws/src` folder (`cd ~/raspv_ws/src` if necessary). If you have your workspace named differently, substitute `raspv_ws` for your workspace name from here on.
 
 The simulated prosthetic vision implementation for RGB-D cameras is in this package. To download:
 ```
 git clone https://github.com/aperezyus/RASPV.git
 ```
 
-## 4. Compile package
+## 4.1. Compile RASPV
 
-To compile, go to the workspace folder and do `catkin_make`.
+To compile RASPV, go to the workspace folder and do `catkin_make`.
 ```
-cd ~/catkin_ws
+cd ~/raspv_ws
 catkin_make
 ```
 or if using `catkin build` write instead
@@ -106,35 +123,28 @@ catkin build
 
 Package `raspv` should be compiled right out of the box with ROS desktop full.
 
+In next subsections we specify another libraries that may be required depending on your desired use:
 
+## 4.2. To install Blindbot
 
-## 7. (OPTIONAL) Install Navigation
+To install Blindbot, make sure you have installed the additional packages:
+```
+sudo apt-get install ros-noetic-joy
+```
+## 4.3. To install Navigation
 
 In particular, you will need to install additional packages:
 ```
-sudo apt-get install ros-melodic-pointcloud-to-laserscan
-sudo apt-get install ros-melodic-map-server
-sudo apt-get install ros-melodic-move-base
-sudo apt-get install ros-melodic-dwa-local-planner
+sudo apt-get install ros-noetic-pointcloud-to-laserscan
+sudo apt-get install ros-noetic-map-server
+sudo apt-get install ros-noetic-move-base
+sudo apt-get install ros-noetic-dwa-local-planner
 
 ```
 
+## 5. To run experiments:
 
-## The rest? (in construction)
-
-
-To make our turtlebot packages work, first the following packages should be installed:
-```
-sudo apt-get install ros-kinetic-gazebo-*
-sudo apt-get install ros-kinetic-turtlebot-*
-sudo apt-get install ros-kinetic-joint-state-controller
-sudo apt-get install ros-kinetic-effort-controllers
-sudo apt-get install ros-kinetic-position-controllers
-```
-
-## 5. To run:
-
-### Gazebo simulation
+### Virtual experiment
 
 For example, in order to run the program in a Gazebo simulation:
 
@@ -142,88 +152,65 @@ For example, in order to run the program in a Gazebo simulation:
 ```
 roscore
 ```
-2. Launch Gazebo, with our modified turtlebot and in a custom map:
+2. Launch the **Gazebo simulation of blindbot** in a realistic house environment
 ```
-roslaunch turtlebot_gazebo daniel.launch
-```
-3. Run our simulator!
-```
-rosrun rgbd_via SPV_Gazebo
+roslaunch blindbot_gazebo sweet_house3.launch
+
 ```
 
-Instructions are given on the terminal to control the robot with the keyboard and manage visualization.
+By default, running the above command should launch Gazebo, and .
 
-Additionally, if the user wants to use a gamepad, open new terminal and launch controller node:
+3. To **control the robot**, you can launch the keyboard_teleop in another terminal:
 ```
-roslaunch teleop_twist_joy teleop_smooth.launch
+roslaunch blindbot_teleop keyboard_teleop_angles.launch
 ```
+Instructions to move the robot and the head (well, the camera) are given in the same terminal.
 
-### RGB-D camera (Asus Xtion Pro Live)
+Alternatively, if the user wants to use a **gamepad**, open new terminal and launch controller node (may require some previous configuration):
+```
+roslaunch blindbot_teleop joy_teleop.launch
+```
+4. Launch **RASPV**, including **phosphene/mode visualizations**
+```
+roslaunch raspv SPV.launch
+```
+Instructions are given on the terminal to manage visualization and change parameters of the prosthesis. By default, the configuration of the prosthesis is chosen from /config folder (that you can change, not needing to re-compile).
 
-In this case, the second terminal should launch the OpenNI2 package instead:
-```
-roslaunch openni2_launch openni2.launch
-```
-The program to run is the following:
-```
-rosrun rgbd_via SPV
-```
+5. Launch **navigation package**.
 
-### With SLAM -- Not working
+In order to introduce **navigation goals** (e.g. doors, tables), you can launch `SPV_goals.launch` instead of `SPV.launch` to see how goals are added. It is currently programmed it with a few assistant modes/goals that work with sweet_home3 map.
 
-You can use a SLAM node working in parallel to be able to keep the system localized and enhance some visualizations (e.g. Checkerboard)
+Then, run the navigation package itself:
 
-We have tested this with a modified version of ORBSLAM2, which you can download and install following the instructions here (link)
-
-You will need a fourth terminal launching ORBSLAM2 node:
 ```
-TODO
-```
-
-and run the following rgbd_via program:
-```
-rosrun rgbd_via SPV_SLAM
-```
-Notice that it should run both with simulation and with an RGB-D camera attached.
-
-### With simulated SLAM -- Not working
-
-SPV_Gazebo benefits from having the pose perfectly known given a Gazebo plugin (no need to extract floor, main directions, odometry). If you want to run this package more realistically as if you had a SLAM without having a SLAM installed, you can use the Gazebo plugin that publishes the pose of the camera to simulate just the odometry but compute everything else:
-```
-rosrun rgbd_via SPV_SLAM_Gazebo
+roslaunch navigation navigation_sweet3.launch
 ```
 
-### With stair detection and modeling -- Not working
+It should open RVIZ already configured to visualize the map, the costmaps, the path, the robot, and the live pointcloud.
 
-We can use the RGB-D camera to perform detection of Staircases and show them in prosthetic vision with this package, using the Stair detection and modeling implementation from Perez-Yus et al. [cite].
+By default, a goal is pre-established (the kitchen door). You can configure that in the `SPV_goals.launch` file.
 
-You can test the stair detection with an RGB-D camera or in Gazebo running:
-```
-rosrun rgbd_via stairs
-```
-and with Simulated Prosthetic Vision with:
-```
-rosrun rgbd_via SPV_stairs
-```
 
-You can also test it in Gazebo, with simulated odometry, running the following program:
-```
-rosrun rgbd_via SPV_SLAM_Gazebo_stairs
-```
+6. Alternatively... **LAUNCH ALL TOGETHER!**
 
-### Navigation -- Not working
+It may look chaotic in the terminal, but if you want to save time, you can just launch the included `RASPV_blindbot_navigation.launch` that is included in the root folder of the package.
 
-We have also implemented a Navigation package to allow us to display in prosthetic vision the path the user have to follow to reach the desired point given a known map.
 
-Before, it is necessary to switch to Navigation branch and install the following ROS package:
-```
-sudo apt-get install pointcloud-to-laserscan
-```
-and our following implementation of the navigation node:
-```
-Lorenzo's modified navigation package
-```
+### Real experiment
 
-To run... (TODO)
+You can also make this code work with an RGB-D camera, such as the ASUS Xtion Pro Live. You would need to install first the OpenNI2 package:
+```
+sudo apt-get install ros-noetic-openni2-launch
+```
+And then launch the camera driver itself:
+```
+roslaunch openni2_launch openni2.launch depth_registration:=true
+```
+To make this execution mode work with RASPV, modify the SPV.launch so that USE_MODE_GAZEBO is set to false, or, alternatively:
+```
+roslaunch raspv SPV.launch USE_MODE_GAZEBO:=false
+```
+And then the program expects a camera. Notice that, both Gazebo and OpenNI2 drivers use the same type of messages, so the code should work out of the box.
+
 
 
