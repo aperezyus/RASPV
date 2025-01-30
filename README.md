@@ -29,7 +29,7 @@ This package includes all the robotics framework to perform experimentation with
 **Fork/Modification Notice:**
 Part of this package is derived from [turtlebot3] (BSD/Apache 2.0 licensed). Major changes include renaming it to blindbot, changing the physical aspect and movement/joints to make it more similar to a human. This fork is maintained by A. Perez-Yus (alperez@unizar.es).
 
-Instructions are given below. If you see anything broken, you can post an issue or directly contact the authors. If you find something missing, it may be not ready for publication yet. Feel free to contact the authors if you need more information.https://meet.google.com/pnt-vock-tby
+Instructions are given below. If you see anything broken, you can post an issue or directly contact the authors. If you find something missing, it may be not ready for publication yet. Feel free to contact the authors if you need more information.
 
 Tried on:
 - Ubuntu 16.04 with ROS Kinetic
