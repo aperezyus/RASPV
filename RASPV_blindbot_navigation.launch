@@ -1,0 +1,245 @@
+<launch>
+
+  <!-- Choose model (asus, intel). Asus camera recommended (faster) -->
+  <arg name="model" default="blind_asus" doc="model type ([blind_asus,blind_intel])"/> <!-- TODO: fix intel (I haven't used it in a while)-->
+
+  <!-- Choose the coordinates where does the robot starts in the map -->
+  <arg name="x_pos" default="5.6"/>
+  <arg name="y_pos" default="-3.5"/>
+  <arg name="z_pos" default="0.0"/>
+  
+  <env name="GAZEBO_MODEL_PATH" value="$(find blindbot_gazebo)/models:$(optenv GAZEBO_MODEL_PATH)" />
+
+  <!-- Load the desired world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find blindbot_gazebo)/worlds/sweet3.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/> <!-- if set to false, no gazebo gui is launched -->
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    <arg name="verbose" value="false"/>
+  </include>
+
+
+  <!-- Load the robot_description to be spawned -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find blindbot_description)/urdf/$(arg model)_bot.urdf.xacro" />
+
+  <!-- Spawn the robot. Type "rosrun gazebo_ros spawn_model -h" to see all parameters -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model blindbot -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+
+  <!-- Load the joint controllers for the camera joint -->
+  <rosparam file="$(find blindbot_description)/config/config.yaml" command="load" />
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/camera_joint_model" args="joint_state_controller kinect_joint_controller1 kinect_joint_controller2 kinect_joint_controller3" />
+
+  <!-- Initialize robot_state_publisher to continuously publish the state of the joint in /tf -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="30.0" />
+  </node>
+
+  <!-- Initialize joint_state_publisher for the camera_joints -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="source_list">["camera_joint_model/joint_states"]</rosparam>
+  </node>
+
+  <!-- Launch the groundtruth_node, which continuously publishes to /tf the relative position of the base_footprint to world reference frame -->
+  <node pkg="blindbot_gazebo" type="groundtruth_node" name="groundtruth_node">
+    <param name="Topic_name" value="/ground_truth/state"/>
+    <param name="childFrame_id" value="base_footprint"/>
+    <param name="parentFrame_id" value="world"/>
+  </node>
+
+    <!-- blindbot_teleop_key already has its own built in velocity smoother -->
+  <node pkg="blindbot_teleop" type="blindbot_teleop_angles_key" name="blindbot_teleop_keyboard"  output="screen">
+    <!--param name="scale_linear" value="0.6" type="double"/-->
+    <!--param name="scale_angular" value="1.5" type="double"/-->
+    <remap from="blindbot_teleop_keyboard/cmd_vel" to="mobile_base/commands/velocity"/>
+  </node>
+
+  <arg name="SPV_model" default="optimist" doc="SPV model type [default, argus, rgbd, camera]"/>
+
+  <arg name="USE_MODE_RGBD" default="true"/>
+  <arg name="USE_MODE_GAZEBO" default="true"/>
+  <arg name="USE_MODE_SLAM" default="false"/>
+  <arg name="USE_MODE_STAIR" default="false"/>
+  <arg name="USE_MODE_NAVIGATION" default="true"/>
+  <!-- <arg name="USE_MODE_DOOR" default="true"/> -->
+  <arg name="USE_ASSISTANT_MODE" default="1"/>
+
+
+  <arg name="USE_CAMERA_FROM_TOPIC" default="true"/>
+  <arg name="USE_SPV_FROM_CAMERA" default="true"/>
+  <arg name="SET_SAVE_IMG_PATH" default="/home/aleks"/>
+
+  <node pkg="raspv" type="SPV" name="SPV_node" output="screen">
+
+    <!-- 1. Kitchen -->
+    <param name="goal_x_1" type="double" value="5.0"/>
+    <param name="goal_y_1" type="double" value="-4.4"/>
+    <param name="goal_yaw_1" type="double" value="0.0"/>
+    <param name="goal_width_1" type="double" value="0.9"/>
+    <param name="goal_height_1" type="double" value="2.0"/>
+
+    <!-- 2. Bathroom -->
+    <param name="goal_x_2" type="double" value="7.2"/>
+    <param name="goal_y_2" type="double" value="-4.4"/>
+    <param name="goal_yaw_2" type="double" value="0.0"/>
+    <param name="goal_width_2" type="double" value="0.9"/>
+    <param name="goal_height_2" type="double" value="2.0"/>
+
+    <!-- 3. Bedroom -->
+    <param name="goal_x_3" type="double" value="3.2"/>
+    <param name="goal_y_3" type="double" value="-3.3"/>
+    <param name="goal_yaw_3" type="double" value="1.5708"/>
+    <param name="goal_width_3" type="double" value="0.90"/>
+    <param name="goal_height_3" type="double" value="2.0"/>
+
+    <!-- 4. Table -->
+    <param name="goal_x_4" type="double" value="5.0"/>
+    <param name="goal_y_4" type="double" value="-2.3"/>
+    <param name="goal_yaw_4" type="double" value="0.0"/>
+    <param name="goal_width_4" type="double" value="1.15"/>
+    <param name="goal_height_4" type="double" value="0.75"/>
+
+    <!-- 5. Office chair -->
+    <param name="goal_x_5" type="double" value="4.0"/>
+    <param name="goal_y_5" type="double" value="-0.9"/>
+    <param name="goal_yaw_5" type="double" value="-0.785"/>
+    <param name="goal_width_5" type="double" value="0.4"/>
+    <param name="goal_height_5" type="double" value="0.45"/>
+
+    <!-- 6. Dish -->
+    <param name="goal_x_6" type="double" value="5.0"/>
+    <param name="goal_y_6" type="double" value="-1.4"/>
+    <param name="goal_yaw_6" type="double" value="0.0"/>
+    <param name="goal_width_6" type="double" value="0.3"/>
+    <param name="goal_height_6" type="double" value="0.75"/>
+
+
+
+    <param name="MODE_RGBD" type="bool" value="$(arg USE_MODE_RGBD)"/>
+    <param name="MODE_GAZEBO" type="bool" value="$(arg USE_MODE_GAZEBO)"/>
+    <param name="MODE_SLAM" type="bool" value="$(arg USE_MODE_SLAM)"/>
+    <param name="MODE_STAIR" type="bool" value="$(arg USE_MODE_STAIR)"/>
+    <param name="MODE_NAVIGATION" type="bool" value="$(arg USE_MODE_NAVIGATION)"/>
+    <!-- <param name="MODE_DOOR" type="bool" value="$(arg USE_MODE_DOOR)"/> -->
+    <!-- <param name="MODE_DOOR_FIRST" type="bool" value="true"/> -->
+    <param name="ASSISTANT_MODE" type="int" value="$(arg USE_ASSISTANT_MODE)"/>
+
+    <param name="CAMERA_FROM_TOPIC" type="bool" value="$(arg USE_CAMERA_FROM_TOPIC)"/>
+    <param name="SPV_FROM_CAMERA" type="bool" value="$(arg USE_SPV_FROM_CAMERA)" />
+    <param name="SAVE_IMG_PATH" type="string" value="$(arg SET_SAVE_IMG_PATH)" />
+
+    <rosparam file="$(find raspv)/config/devices/$(arg SPV_model).yaml" command="load" />
+    <rosparam file="$(find raspv)/config/display.yaml" command="load" />
+    <rosparam file="$(find raspv)/config/representation.yaml" command="load" />
+    <rosparam file="$(find raspv)/config/default_camera.yaml" command="load" />
+    <!--param name="PACKAGE_PATH" value="/home/melani/rgbd_ws/src/rgbd_via/" /-->
+  </node>
+
+
+  <!-- 3D sensor -->
+  <arg name="3d_sensor" default="asus_xtion_pro"/>  <!-- r200, kinect, asus_xtion_pro -->
+  <!--include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
+    <arg name="rgb_processing" value="false" />
+    <arg name="depth_registration" value="false" />
+    <arg name="depth_processing" value="false" /-->
+
+    <!-- We must specify an absolute topic name because if not it will be prefixed by "$(arg camera)".
+         Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 -->
+    <!--arg name="scan_topic" value="/camera/scan" />
+  </include-->
+
+
+  <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+     <remap from="cloud_in" to="/camera/depth_registered/points"/>
+     <remap from="scan" to="/camera/scan"/>
+     <rosparam>
+       target_frame: base_footprint #Leave disabled to output scan in pointcloud frame
+       transform_tolerance: 0.01
+       min_height: 0.3
+       max_height: 1.7
+
+       angle_min: -1.5708 # -M_PI/2
+       angle_max: 1.5708 # M_PI/2
+       angle_increment: 0.0087 # M_PI/360.0
+       scan_time: 0.3333
+       range_min: 0.45
+       range_max: 8.0
+       use_inf: true
+       inf_epsilon: 1.0
+
+       # Concurrency level, affects number of pointclouds queued for processing, thread number governed by nodelet manager
+       # 0 : Detect number of cores
+       # 1 : Single threaded
+       # 2->inf : Parallelism level
+       concurrency_level: 0
+     </rosparam>
+   </node>
+
+
+  <!-- Map server -->
+  <arg name="map_file" default="$(find navigation)/maps/sweet3_map.yaml"/>  <!--map_emptyhouse.yaml-->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <!-- AMCL -->
+  <!--arg name="custom_amcl_launch_file" default="$(find navigation)/launch/includes/amcl/$(arg 3d_sensor)_amcl.launch.xml"/>
+  <arg name="initial_pose_x" default="0.0"/>
+  <arg name="initial_pose_y" default="0.0"/>
+  <arg name="initial_pose_a" default="0.0"/>
+  <arg name="scan_topic" default="/camera/scan"/>
+  <include file="$(arg custom_amcl_launch_file)">
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+  </include-->
+  <node pkg="tf" type="static_transform_publisher" name="map_pub" args="0 0 0 0 0 0   /map /world  100"/>
+  <!-- Move base -->
+  <!-- <arg name="custom_param_file" default="$(find navigation)/param/dummy.yaml"/>
+  <include file="$(find navigation)/launch/includes/move_base_gazebo.launch.xml">
+    <arg name="custom_param_file" value="$(arg custom_param_file)"/>
+  </include> -->
+
+  <arg name="odom_frame_id"   default="world"/>   <!--arg name="odom_frame_id"   default="odom"/-->
+  <arg name="base_frame_id"   default="base_link"/>   <!--arg name="base_frame_id"   default="base_footprint"/-->
+  <arg name="global_frame_id" default="map"/>
+  <arg name="odom_topic" default="/ground_truth/state" /> <!--arg name="odom_topic" default="ORB_SLAM2/pose" /-->
+  <arg name="laser_topic" default="/camera/scan" />
+  <arg name="custom_param_file" default="$(find navigation)/param/dummy.yaml"/>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find navigation)/param/costmap_common_params_gazebo.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find navigation)/param/costmap_common_params_gazebo.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find navigation)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find navigation)/param/global_costmap_params_gazebo.yaml" command="load" />
+    <rosparam file="$(find navigation)/param/dwa_local_planner_params_gazebo.yaml" command="load" />
+    <rosparam file="$(find navigation)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find navigation)/param/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find navigation)/param/navfn_global_planner_params.yaml" command="load" />
+    <!-- external params file that could be loaded into the move_base namespace -->
+    <!-- <rosparam file="$(arg custom_param_file)" command="load" /> -->
+
+    <!-- added to find the scan height wich the costamp is filled by the planner -->
+    <!--param name="/local_costmap/obstacle_layer/origin_z" value="1.287" />
+    <param name="/global_costmap/obstacle_layer/origin_z" value="1.287" /-->
+
+    <!-- reset frame_id parameters using user input data -->
+    <param name="global_costmap/global_frame" value="$(arg global_frame_id)"/>
+    <param name="global_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+    <param name="local_costmap/global_frame" value="$(arg odom_frame_id)"/>
+    <param name="local_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+    <param name="DWAPlannerROS/global_frame_id" value="$(arg odom_frame_id)"/>
+
+    <remap from="cmd_vel" to="navigation_velocity_smoother/raw_cmd_vel"/>
+    <remap from="odom" to="$(arg odom_topic)"/>
+    <remap from="scan" to="$(arg laser_topic)"/>
+    <!--remap from="move_base_simple/goal" to="goal"/-->
+  </node>
+
+
+   <!-- Include rviz navigation launch -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find navigation)/rviz/navigation_raspv.rviz" output="screen" />
+   <!-- include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/ -->
+
+
+</launch>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>blindbot_description</name>
+  <version>1.2.0</version>
+  <description>
+    This package is a modification of turtlebot_description package made by Alejandro Perez-Yus (from Universidad de Zaragoza)
+    3D models of the TurtleBot3 for simulation and visualization
+  </description>
+  <license>Apache 2.0</license>
+  <author email="pyo@robotis.com">Original author: Pyo</author>
+  <author email="thlim@robotis.com">Original author: Darby Lim</author>
+  <author email="kkjong@robotis.com">Original author: Gilbert</author>
+  <maintainer email="pyo@robotis.com">Original maintainer: Pyo</maintainer>
+  <maintainer email="thlim@robotis.com">Original maintainer: Darby Lim</maintainer>
+  <author email="alperez@unizar.es">A. Perez-Yus</author>
+  <maintainer email="alperez@unizar.es">A. Perez-Yus</maintainer>
+  <url type="website">http://wiki.ros.org/turtlebot3_description</url>
+  <url type="emanual">http://turtlebot3.robotis.com</url>
+  <url type="repository">https://github.com/ROBOTIS-GIT/turtlebot3</url>
+  <url type="bugtracker">https://github.com/ROBOTIS-GIT/turtlebot3/issues</url>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>urdf</depend>
+  <depend>xacro</depend>
+</package>

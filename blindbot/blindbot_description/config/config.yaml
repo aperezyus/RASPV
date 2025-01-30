@@ -1,0 +1,31 @@
+camera_joint_model:
+    joint_state_controller:
+        type: joint_state_controller/JointStateController
+        publish_rate: 20
+
+    kinect_joint_controller1:
+        type: position_controllers/JointPositionController
+        joint: cameraPsi
+
+    kinect_joint_controller2:
+        type: position_controllers/JointPositionController
+        joint: cameraTheta
+
+    kinect_joint_controller3:
+        type: position_controllers/JointPositionController
+        joint: cameraPhi
+
+    gazebo_ros_control:
+        pid_gains:
+            cameraPsi:
+                p: 0.001
+                i: 0.001
+                d: 0.01
+            cameraTheta:
+                p: 0.001
+                i: 0.001
+                d: 0.01
+            cameraPhi:
+                p: 0.001
+                i: 0.001
+                d: 0.01

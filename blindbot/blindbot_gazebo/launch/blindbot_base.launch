@@ -1,0 +1,70 @@
+<launch>
+
+  <!-- Choose model (asus, intel). Asus camera recommended (faster) -->
+  <arg name="model" default="blind_asus" doc="model type ([blind_asus,blind_intel])"/> <!-- TODO: fix intel (I haven't used it in a while)-->
+
+  <!-- Choose the coordinates where does the robot starts in the map -->
+  <arg name="x_pos" default="-6.0"/>
+  <arg name="y_pos" default="3.0"/>
+  <arg name="z_pos" default="0.0"/>
+
+  <!-- Load the desired world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find blindbot_gazebo)/worlds/EnvA.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/> <!-- if set to false, no gazebo gui is launched -->
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    <arg name="verbose" value="false"/>
+  </include>
+
+  <!-- Load the robot_description to be spawned -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find blindbot_description)/urdf/$(arg model)_bot.urdf.xacro" />
+
+  <!-- Spawn the robot. Type "rosrun gazebo_ros spawn_model -h" to see all parameters -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model blindbot -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+
+  <!-- Load the joint controllers for the camera joint -->
+  <rosparam file="$(find blindbot_description)/config/config.yaml" command="load" />
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/camera_joint_model" args="joint_state_controller kinect_joint_controller1 kinect_joint_controller2 kinect_joint_controller3" />
+
+  <!-- Initialize robot_state_publisher to continuously publish the state of the joint in /tf -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="30.0" />
+  </node>
+
+  <!-- Initialize joint_state_publisher for the camera_joints -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="source_list">["camera_joint_model/joint_states"]</rosparam>
+  </node>
+
+  <!-- Launch the groundtruth_node, which continuously publishes to /tf the relative position of the base_footprint to world reference frame -->
+  <node pkg="blindbot_gazebo" type="groundtruth_node" name="groundtruth_node">
+    <param name="Topic_name" value="/ground_truth/state"/>
+    <param name="childFrame_id" value="base_footprint"/>
+    <param name="parentFrame_id" value="world"/>
+  </node>
+
+
+  <!--joy_teleop.launch-->
+
+  <!-- <arg name="joy_config" default="senze" />
+  <arg name="joy_dev" default="/dev/input/js0" />
+  <arg name="config_filepath" default="$(find blindbot_teleop)/config/$(arg joy_config).config.yaml" />
+
+  <node pkg="joy" type="joy_node" name="joy_node">
+    <param name="dev" value="$(arg joy_dev)" />
+    <param name="deadzone" value="0.3" />
+    <param name="autorepeat_rate" value="100" />
+  </node>
+
+  <node pkg="blindbot_teleop" name="teleop_twist_joy" type="teleop_node">
+    <rosparam command="load" file="$(arg config_filepath)" />
+  </node> -->
+
+  <!--  smooths inputs from cmd_vel_mux/input/teleop_raw to cmd_vel_mux/input/teleop -->
+  <!-- <include file="$(find blindbot_teleop)/launch/includes/velocity_smoother.launch.xml"/> -->
+
+
+</launch>

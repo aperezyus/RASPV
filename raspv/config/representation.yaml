@@ -1,0 +1,5 @@
+representation:
+  mode: 2
+  dChessX: 0.5
+  dChessY: 0.5
+  max_depth: 3.0

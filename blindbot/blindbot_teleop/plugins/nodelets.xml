@@ -1,0 +1,19 @@
+<library path="lib/libyocs_velocity_smoother_nodelet">
+  <class name="yocs_velocity_smoother_nodelet/VelocitySmootherNodelet"
+         type="yocs_velocity_smoother::VelocitySmootherNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      Implementation for the command velocity smoother as a nodelet.
+    </description>
+  </class>
+</library>
+
+<!-- <library path="lib/libyocs_cmd_vel_mux_nodelet">
+  <class name="yocs_cmd_vel_mux_nodelet/CmdVelMuxNodelet"
+         type="yocs_cmd_vel_mux::CmdVelMuxNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      Implementation for the command velocity multiplexer as a nodelet.
+    </description>
+  </class>
+</library> -->

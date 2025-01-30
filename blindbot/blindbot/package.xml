@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>blindbot</name>
+  <version>1.0.0</version>
+  <description>
+    Modified version of the Turtlebot3 to simulate visually impaired person for our Simulated Prosthetic Vision program
+  </description>
+  <license>GPLv3</license>
+  <author email="alperez@unizar.es">Alejandro</author>
+  <author>Alejandro Perez-Yus</author>
+  <maintainer email="alperez@unizar.es">Alejandro</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>blindbot_description</exec_depend>
+  <exec_depend>blindbot_gazebo</exec_depend>
+  <exec_depend>blindbot_teleop</exec_depend>
+  <export><metapackage/></export>
+</package>

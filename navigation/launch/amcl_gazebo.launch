@@ -1,0 +1,73 @@
+<launch>
+  <!-- 3D sensor -->
+  <arg name="3d_sensor" default="asus_xtion_pro"/>  <!-- r200, kinect, asus_xtion_pro -->
+  <!--include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
+    <arg name="rgb_processing" value="false" />
+    <arg name="depth_registration" value="false" />
+    <arg name="depth_processing" value="false" /-->
+
+    <!-- We must specify an absolute topic name because if not it will be prefixed by "$(arg camera)".
+         Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 -->
+    <!--arg name="scan_topic" value="/camera/scan" />
+  </include-->
+
+
+  <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+     <remap from="cloud_in" to="/camera/depth_registered/points"/>
+     <remap from="scan" to="/camera/scan"/>
+     <rosparam>
+       target_frame: base_footprint #Leave disabled to output scan in pointcloud frame
+       transform_tolerance: 0.01
+       min_height: 0.3
+       max_height: 1.7
+
+       angle_min: -1.5708 # -M_PI/2
+       angle_max: 1.5708 # M_PI/2
+       angle_increment: 0.0087 # M_PI/360.0
+       scan_time: 0.3333
+       range_min: 0.45
+       range_max: 8.0
+       use_inf: true
+       inf_epsilon: 1.0
+
+       # Concurrency level, affects number of pointclouds queued for processing, thread number governed by nodelet manager
+       # 0 : Detect number of cores
+       # 1 : Single threaded
+       # 2->inf : Parallelism level
+       concurrency_level: 0
+     </rosparam>
+   </node>
+
+
+  <!-- Map server -->
+  <arg name="map_file" default="$(find navigation)/maps/EnvA.yaml"/>  <!--map_emptyhouse.yaml-->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <!-- AMCL -->
+  <!--arg name="custom_amcl_launch_file" default="$(find navigation)/launch/includes/amcl/$(arg 3d_sensor)_amcl.launch.xml"/>
+  <arg name="initial_pose_x" default="0.0"/>
+  <arg name="initial_pose_y" default="0.0"/>
+  <arg name="initial_pose_a" default="0.0"/>
+  <arg name="scan_topic" default="/camera/scan"/>
+  <include file="$(arg custom_amcl_launch_file)">
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+  </include-->
+  <node pkg="tf" type="static_transform_publisher" name="map_pub" args="0 0 0 0 0 0   /map /world  100"/>
+  <!-- Move base -->
+  <arg name="custom_param_file" default="$(find navigation)/param/dummy.yaml"/>
+  <include file="$(find navigation)/launch/includes/move_base_gazebo.launch.xml">
+    <arg name="custom_param_file" value="$(arg custom_param_file)"/>
+  </include>
+
+   <!-- Include rviz navigation launch -->
+   <!--include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/-->
+
+<!--node name="goal" pkg="rostopic" type="rostopic"
+    args="pub goal geometry_msgs/PoseStamped
+   '{header: {seq: auto, stamp: now, frame_id: 'map'},
+    pose: {position: {x: 6.0, y: 0.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: -0.70482373086, w: 0.709382483867}}}' -r 1">
+ <remap from="goal" to="move_base_simple/goal"/>
+</node-->
+</launch>

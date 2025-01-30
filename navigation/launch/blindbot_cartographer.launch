@@ -1,0 +1,27 @@
+<launch>
+
+  <!--arg name="model_name"  default="beetle_robot"/>
+  <arg name="model"     default="$(find blindbot_description)/urdf/$(arg model_name).urdf"/-->
+    
+  <!-- Send the robot XML to param server -->
+  <!--param name="robot_description" command="$(find xacro)/xacro --><!--inorder $(arg model)" /-->
+  
+  <!--  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
+
+  <node name="cartographer_node" pkg="cartographer_ros"
+      type="cartographer_node" args="
+          -configuration_directory $(find navigation)/config/cartographer/
+          -configuration_basename blindbot_cartographer_2d.lua"
+      output="screen">
+    <!--remap from="imu" to="imu/data" /-->
+    <!--remap from="scan" to="/camera/scan" /-->
+    <!--remap from="odom" to="/ground_truth/state" /-->
+  
+  </node>
+
+<node name="rviz" pkg="rviz" type="rviz" required="true"
+    args="-d $(find navigation)/config/cartographer/demo_2d.rviz" />
+
+  
+</launch>
+

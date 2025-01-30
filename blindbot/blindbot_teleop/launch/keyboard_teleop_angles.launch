@@ -1,0 +1,8 @@
+<launch>
+  <!-- blindbot_teleop_key already has its own built in velocity smoother -->
+  <node pkg="blindbot_teleop" type="blindbot_teleop_angles_key" name="blindbot_teleop_keyboard"  output="screen">
+    <!--param name="scale_linear" value="0.6" type="double"/-->
+    <!--param name="scale_angular" value="1.5" type="double"/-->
+    <remap from="blindbot_teleop_keyboard/cmd_vel" to="mobile_base/commands/velocity"/>
+  </node>
+</launch>

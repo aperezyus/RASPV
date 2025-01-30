@@ -1,0 +1,6 @@
+free_thresh: 0.196
+image: EnvX.jpg
+negate: 0
+occupied_thresh: 0.65
+origin: [-10.0, -10.0, 0] # To rotate, [10.0, 10.0, 3.141592]
+resolution: 0.02 # 20m/1000 pixels

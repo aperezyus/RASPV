@@ -1,0 +1,48 @@
+<package>
+  <name>blindbot_teleop</name>
+  <version>2.4.2</version>
+  <description>
+  This package is a modification of turtlebot_teleop package made by Alejandro Perez-Yus (from Universidad de Zaragoza)
+  Provides teleoperation using joysticks or keyboard.</description>
+  <maintainer email="mwise@willowgarage.com">Melonee Wise</maintainer>
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/turtlebot_teleop</url>
+  <url type="repository">https://github.com/turtlebot/turtlebot</url>
+  <url type="bugtracker">https://github.com/turtlebot/turtlebot/issues</url>
+  
+  <author email="mwise@willowgarage.com">Original author: Melonee Wise</author>
+  <author email="alperez@unizar.es">A. Perez-Yus</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>joy</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <!--build_depend>ecl_threads</build_depend-->
+  <!-- <build_depend>dynamic_reconfigure</build_depend> -->
+  <!-- <build_depend>yaml-cpp</build_depend> -->
+
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>joy</run_depend>
+  <!-- <run_depend>kobuki_safety_controller</run_depend> -->
+  <!-- <run_depend>yocs_velocity_smoother</run_depend> -->
+  <!--run_depend>turtlebot_bringup</run_depend-->
+  <run_depend>roscpp</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>nav_msgs</run_depend>
+  <!--run_depend>ecl_threads</run_depend-->
+  <!-- <run_depend>dynamic_reconfigure</run_depend> -->
+  <!-- <run_depend>yaml-cpp</run_depend> -->
+
+  <export>
+    <nodelet plugin="${prefix}/plugins/nodelets.xml" />
+  </export>
+  
+</package>

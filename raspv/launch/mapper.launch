@@ -1,0 +1,35 @@
+<launch>
+  <arg name="SPV_model" default="default" doc="SPV model type [default, argus, rgbd, camera]"/>
+
+  <arg name="USE_MODE_RGBD" default="true"/>
+  <arg name="USE_MODE_GAZEBO" default="true"/>
+  <arg name="USE_MODE_SLAM" default="false"/>
+  <arg name="USE_MODE_STAIR" default="false"/>
+  <arg name="USE_MODE_NAVIGATION" default="false"/>
+
+  <arg name="USE_CAMERA_FROM_TOPIC" default="true"/>
+  <arg name="USE_SPV_FROM_CAMERA" default="true"/>
+  <arg name="SET_SAVE_IMG_PATH" default="/home/aleks/"/>
+
+  <node pkg="raspv" type="mapper" name="mapper_node" output="screen">
+    <param name="MODE_RGBD" type="bool" value="$(arg USE_MODE_RGBD)"/>
+    <param name="MODE_GAZEBO" type="bool" value="$(arg USE_MODE_GAZEBO)"/>
+    <param name="MODE_SLAM" type="bool" value="$(arg USE_MODE_SLAM)"/>
+    <param name="MODE_STAIR" type="bool" value="$(arg USE_MODE_STAIR)"/>
+    <param name="MODE_NAVIGATION" type="bool" value="$(arg USE_MODE_NAVIGATION)"/>
+
+    <param name="CAMERA_FROM_TOPIC" type="bool" value="$(arg USE_CAMERA_FROM_TOPIC)"/>
+    <param name="SPV_FROM_CAMERA" type="bool" value="$(arg USE_SPV_FROM_CAMERA)" />
+    <param name="SAVE_IMG_PATH" type="string" value="$(arg SET_SAVE_IMG_PATH)" />
+    
+    <rosparam file="$(find raspv)/config/devices/$(arg SPV_model).yaml" command="load" />
+    <rosparam file="$(find raspv)/config/display.yaml" command="load" />
+    <rosparam file="$(find raspv)/config/representation.yaml" command="load" />
+    <rosparam file="$(find raspv)/config/default_camera.yaml" command="load" />
+    <!--param name="PACKAGE_PATH" value="/home/aserejandro/rgbd_ws/src/raspv/" /-->
+  </node>
+
+
+
+
+</launch>

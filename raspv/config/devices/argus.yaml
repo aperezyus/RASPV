@@ -1,0 +1,10 @@
+device:
+  N_phosphenes: 60
+  FOV_deg: 20.0
+  map_mode: 1 # So the distribution of phosphenes occupies all rectangle area (2 for circle)
+  grid_mode: 1
+  noise_stddev: 0.0
+  dropout_rate: 0.0
+  FOV_phosphene_deg: 1.5
+  N_levels: 7
+  aspect_ratio: 0.6 #6/10
